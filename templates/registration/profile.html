@@ -1,0 +1,86 @@
+<!-- templates/registration/profile.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>{{ profile.user.username }} — Profile</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f4f6f8;padding:20px}
+    .container{max-width:900px;margin:0 auto}
+    .card{background:#fff;padding:18px;border-radius:8px;border:1px solid #e6e9ee}
+    .meta{color:#666;font-size:13px;margin-bottom:8px}
+    .section{margin-top:12px}
+    a.link{color:#1976d2;text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <h1>Profile — {{ profile.user.username }}</h1>
+      <div>
+        <a class="link" href="{% url 'events_list' %}">&larr; Back to events</a> |
+        <a class="link" href="{% url 'logout' %}">Logout</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Basic</h3>
+      <div class="meta">Full name: {{ profile.full_name|default:"(not set)" }}</div>
+      <div class="meta">Location: {{ profile.location|default:"(not set)" }}</div>
+      <div class="meta">Bio: <div style="margin-top:6px">{{ profile.bio|linebreaks|default:"(not set)" }}</div></div>
+    </div>
+
+    <div class="section card">
+      <h3>Your organized events</h3>
+      {% if organized_events %}
+        <ul>
+          {% for ev in organized_events %}
+            <li><a class="link" href="{% url 'events_detail' ev.id %}">{{ ev.title }}</a> — {{ ev.start_time|date:"N j, Y" }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="meta">You are not organizing any events.</p>
+      {% endif %}
+    </div>
+
+    <div class="section card">
+      <h3>Events you were invited to</h3>
+      {% if invited_events %}
+        <ul>
+          {% for ev in invited_events %}
+            <li><a class="link" href="{% url 'events_detail' ev.id %}">{{ ev.title }}</a></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="meta">No invited events.</p>
+      {% endif %}
+    </div>
+
+    <div class="section card">
+      <h3>Your RSVPs</h3>
+      {% if rsvps %}
+        <ul>
+          {% for r in rsvps %}
+            <li><a class="link" href="{% url 'events_detail' r.event.id %}">{{ r.event.title }}</a> — {{ r.status }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="meta">No RSVPs yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="section card">
+      <h3>Your Reviews</h3>
+      {% if reviews %}
+        <ul>
+          {% for rev in reviews %}
+            <li><a class="link" href="{% url 'events_detail' rev.event.id %}">{{ rev.event.title }}</a> — rating: {{ rev.rating }} — {{ rev.created_at|date:"N j, Y" }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="meta">No reviews yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

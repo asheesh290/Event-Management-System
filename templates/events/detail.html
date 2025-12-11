@@ -1,0 +1,120 @@
+<!-- templates/events/detail.html -->
+{% load static %}
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>{{ event.title }}</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding:20px; background:#f4f6f8; color:#222; }
+    .container { max-width:900px; margin:0 auto; }
+    .box { background:#fff; padding:18px; border-radius:8px; border:1px solid #e6e9ee; }
+    .meta { color:#666; font-size:13px; }
+    .btn { padding:8px 12px; margin-right:8px; border-radius:6px; border:none; cursor:pointer; color:#fff; }
+    .btn-primary { background:#1976d2; }
+    .btn-secondary { background:#6c757d; }
+    .stat { display:inline-block; margin-right:10px; color:#444; font-weight:600; }
+    .review { border-top:1px solid #eee; padding:10px 0; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    a.link { color:#1976d2; text-decoration:none; }
+    .muted { color:#777; font-size:13px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <a class="link" href="{% url 'events_list' %}">&larr; Back to events</a>
+      <div>
+        {% if user.is_authenticated %}
+          Signed in as <strong>{{ user.username }}</strong> |
+          <a class="link" href="{% url 'profile' %}">Profile</a> |
+          <a class="link" href="{% url 'logout' %}?next={{ request.path }}">Logout</a>
+        {% else %}
+          <a class="link" href="{% url 'login' %}?next={{ request.path }}">Login</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="box">
+      <h1>{{ event.title }}</h1>
+      <div class="meta">
+        Organizer: {{ event.organizer.username }} |
+        Location: {{ event.location }} |
+        Start: {{ event.start_time|date:"N j, Y, P" }} |
+        End: {{ event.end_time|date:"N j, Y, P" }}
+      </div>
+
+      <p style="margin-top:12px;">{{ event.description|linebreaks }}</p>
+
+      <div style="margin-top:14px;">
+        <<span class="stat">Going: {{ item.rsvp_counts.Going }}</span>
+        <span class="stat">Maybe: {{ item.rsvp_counts.Maybe }}</span>
+        <span class="stat">Not Going: {{ item.rsvp_counts.Not_Going }}</span>
+
+        <span class="stat">Reviews: {{ review_count }}</span>
+      </div>
+
+      <div style="margin-top:14px;">
+        {% if user.is_authenticated %}
+          <div style="margin-bottom:8px;">
+            <strong>Your RSVP:</strong>
+            {% if user_rsvp %}
+              {{ user_rsvp.status }}
+            {% else %}
+              None
+            {% endif %}
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <form style="display:inline" action="{% url 'events_rsvp' event.id %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="status" value="Going" />
+              <button class="btn btn-primary" type="submit">RSVP Going</button>
+            </form>
+            <form style="display:inline" action="{% url 'events_rsvp' event.id %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="status" value="Maybe" />
+              <button class="btn btn-secondary" type="submit">RSVP Maybe</button>
+            </form>
+            <form style="display:inline" action="{% url 'events_rsvp' event.id %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="status" value="Not Going" />
+              <button class="btn" style="background:#d9534f" type="submit">RSVP Not Going</button>
+            </form>
+          </div>
+        {% else %}
+          <p class="muted">Login to RSVP or post a review.</p>
+        {% endif %}
+      </div>
+
+      <hr style="margin:18px 0; border:none; border-top:1px solid #eee" />
+
+      <h3>Reviews</h3>
+
+      {% if user.is_authenticated %}
+        <form action="{% url 'events_review' event.id %}" method="post" style="margin-bottom:16px;">
+          {% csrf_token %}
+          <label>Rating (1-5): <input type="number" name="rating" min="1" max="5" required></label><br>
+          <label>Comment:<br>
+            <textarea name="comment" rows="4" cols="70"></textarea>
+          </label><br>
+          <button class="btn btn-primary" type="submit">Post Review</button>
+        </form>
+      {% else %}
+        <p class="muted"><a class="link" href="{% url 'login' %}?next={{ request.path }}">Login</a> to post a review.</p>
+      {% endif %}
+
+      {% if reviews %}
+        {% for rev in reviews %}
+          <div class="review">
+            <div class="muted">{{ rev.user.username }} — rating: {{ rev.rating }} — {{ rev.created_at|date:"N j, Y, P" }}</div>
+            <div style="margin-top:6px;">{{ rev.comment|linebreaks }}</div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="muted">No reviews yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

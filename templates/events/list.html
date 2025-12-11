@@ -1,0 +1,93 @@
+<!-- templates/events/list.html -->
+{% load static %}
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Events - List</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background:#f4f6f8; color:#222; }
+    .container { max-width:1000px; margin: 0 auto; }
+    .event { background:#fff; border:1px solid #e6e9ee; padding:16px; margin-bottom:12px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.03); }
+    .meta { color:#666; font-size:13px; margin-bottom:8px; }
+    .actions { margin-top:12px; }
+    .btn { padding:8px 12px; margin-right:8px; border-radius:6px; cursor:pointer; border:none; text-decoration:none; color:#fff; }
+    .btn-primary { background:#1976d2; }
+    .btn-ghost { background:#e9eef7; color:#1976d2; border:1px solid #d6e3fb; }
+    .stat { display:inline-block; margin-right:10px; color:#444; font-weight:600; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+    .small { font-size:13px; color:#666; }
+    a.link { color:#1976d2; text-decoration:none; }
+    .loginarea { font-size:14px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <h1>Events</h1>
+      <div class="loginarea">
+        {% if user.is_authenticated %}
+          Signed in as <strong>{{ user.username }}</strong> |
+          <a class="link" href="{% url 'profile' %}">Profile</a> |
+           <a class="link" href="{% url 'events_create' %}">Create Event</a> |
+           <a href="{% url 'logout' %}" class="btn btn-dark">Logout</a>
+
+        {% else %}
+          <a class="link" href="{% url 'login' %}?next={{ request.path }}">Login</a>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if messages %}
+      <ul>
+        {% for msg in messages %}
+          <li>{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% for item in events_summary %}
+      {% with ev=item.event %}
+      <div class="event">
+        <h2><a class="link" href="{% url 'events_detail' ev.id %}">{{ ev.title }}</a></h2>
+        <div class="meta">
+          Organizer: {{ ev.organizer.username }} |
+          Location: {{ ev.location }} |
+          Start: {{ ev.start_time|date:"N j, Y, P" }}
+        </div>
+        <p>{{ ev.description|truncatechars:220 }}</p>
+
+        <div style="margin-top:10px;">
+          <span class="stat">Going: {{ item.rsvp_counts.Going }}</span>
+          <span class="stat">Maybe: {{ item.rsvp_counts.Maybe }}</span>
+          <span class="stat">Not Going: {{ item.rsvp_counts.Not_Going }}</span>
+
+          <span class="stat">Reviews: {{ item.review_count }}</span>
+        </div>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="{% url 'events_detail' ev.id %}">Details & Reviews</a>
+
+          {% if user.is_authenticated %}
+            {% if item.user_rsvp %}
+              <span class="small">Your RSVP: <strong>{{ item.user_rsvp }}</strong></span>
+            {% else %}
+              <form action="{% url 'events_rsvp' ev.id %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="Going" />
+                <button class="btn btn-ghost" type="submit">RSVP</button>
+              </form>
+            {% endif %}
+          {% else %}
+            <a class="btn btn-ghost" href="{% url 'login' %}?next={% url 'events_detail' ev.id %}">Login to RSVP</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endwith %}
+    {% empty %}
+      <p>No events found.</p>
+    {% endfor %}
+
+  </div>
+</body>
+</html>

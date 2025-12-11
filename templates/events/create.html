@@ -1,0 +1,58 @@
+<!-- templates/events/create.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Create Event</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;padding:20px;background:#f4f6f8}
+    .container{max-width:700px;margin:0 auto;background:#fff;padding:18px;border-radius:8px;border:1px solid #e6e9ee}
+    label{display:block;margin-top:10px;font-weight:600}
+    input[type="text"], textarea, input[type="datetime-local"]{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px}
+    .row {margin-top:8px;}
+    .btn {margin-top:12px;padding:8px 12px;border-radius:6px;background:#1976d2;color:#fff;border:none;cursor:pointer}
+    a.link{color:#1976d2;text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Create Event</h1>
+    <p><a class="link" href="{% url 'events_list' %}">&larr; Back to events</a></p>
+
+    {% if messages %}
+      <ul>
+        {% for msg in messages %}
+          <li>{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <form method="post" action="{% url 'events_create' %}">
+      {% csrf_token %}
+      <label>Title</label>
+      <input type="text" name="title" required>
+
+      <label>Description</label>
+      <textarea name="description" rows="4"></textarea>
+
+      <label>Location</label>
+      <input type="text" name="location" required>
+
+      <label>Start time</label>
+      <input type="datetime-local" name="start_time" required>
+
+      <label>End time</label>
+      <input type="datetime-local" name="end_time" required>
+
+      <label>
+        <input type="checkbox" name="is_public" checked> Public event
+      </label>
+
+      <label>Invited users (comma-separated usernames) — optional (for private events)</label>
+      <input type="text" name="invited_users" placeholder="user1, user2">
+
+      <button class="btn" type="submit">Create</button>
+    </form>
+  </div>
+</body>
+</html>

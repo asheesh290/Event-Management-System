@@ -1,0 +1,109 @@
+<!-- templates/overview.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Event Management API — Overview</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; margin: 28px; color: #222; line-height: 1.5; }
+    h1 { font-size: 28px; margin-bottom: 6px; }
+    h2 { font-size: 20px; margin-top: 18px; margin-bottom: 6px; }
+    pre, code { background: #f6f6f6; padding: 8px; border-radius: 4px; display: block; white-space: pre-wrap; }
+    section { margin-bottom: 12px; }
+    ul { margin-top: 6px; }
+    .muted { color: #555; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1>Overview</h1>
+  <p class="muted">This assignment focuses on building an Event Management API using Django and Django REST Framework (DRF). The API allows users to create events, RSVP, and leave reviews. The assignment tests understanding of serializers, viewsets, permissions, and authentication.</p>
+
+  <h2>Objective</h2>
+  <p>Demonstrate your ability to build RESTful APIs using Django REST Framework, manage relationships between models, and implement authentication, permissions, and validations.</p>
+
+  <h2>Assignment Requirements</h2>
+
+  <section>
+    <h3>1. Models</h3>
+    <ul>
+      <li><strong>UserProfile</strong>: Extends Django’s built-in User model with <em>full_name</em>, <em>bio</em>, <em>location</em>, and <em>profile_picture</em>.</li>
+      <li><strong>Event</strong>: Contains <em>title</em>, <em>description</em>, <em>organizer</em>, <em>location</em>, <em>start_time</em>, <em>end_time</em>, <em>is_public</em> (Boolean), <em>created_at</em>, and <em>updated_at</em>.</li>
+      <li><strong>RSVP</strong>: Handles user RSVPs for events with fields like <em>event</em>, <em>user</em>, and <em>status</em> ('Going', 'Maybe', 'Not Going').</li>
+      <li><strong>Review</strong>: Allows users to leave a review for an event with fields like <em>event</em>, <em>user</em>, <em>rating</em>, and <em>comment</em>.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>2. API Endpoints</h3>
+
+    <p><strong>Event API</strong>:</p>
+    <pre>
+POST /events/               : Create a new event (authenticated users only).
+GET  /events/               : List all public events (with pagination).
+GET  /events/{id}/          : Get details of a specific event.
+PUT  /events/{id}/          : Update an event (only the organizer can edit).
+DELETE /events/{id}/        : Delete an event (only the organizer).
+    </pre>
+
+    <p><strong>RSVP API</strong>:</p>
+    <pre>
+POST  /events/{event_id}/rsvp/               : RSVP to an event.
+PATCH /events/{event_id}/rsvp/{user_id}/     : Update RSVP status.
+    </pre>
+
+    <p><strong>Review API</strong>:</p>
+    <pre>
+POST /events/{event_id}/reviews/    : Add a review for an event.
+GET  /events/{event_id}/reviews/    : List all reviews for an event.
+    </pre>
+  </section>
+
+  <section>
+    <h3>3. Core Features</h3>
+    <ul>
+      <li><strong>Custom Permissions</strong>:
+        <ul>
+          <li>Only the organizer of an event can edit or delete it.</li>
+          <li>Restrict access to private events to invited users only.</li>
+        </ul>
+      </li>
+      <li><strong>Pagination, Filtering & Search (optional)</strong>:
+        <ul>
+          <li>Paginate event and review listings.</li>
+          <li>Implement search/filter for events (by title, location, or organizer).</li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>4. Authentication & Security</h3>
+    <p>Use JWT Authentication for securing all API endpoints. Ensure private events are only visible to invited users (use permissions).</p>
+  </section>
+
+  <section>
+    <h3>Submission Guidelines</h3>
+    <ul>
+      <li>Fork the provided repository and complete the assignment.</li>
+      <li>Commit changes regularly with clear commit messages.</li>
+      <li>Add a <code>README.md</code> with setup instructions.</li>
+      <li>Submit the GitHub repository link on completion.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>Evaluation Criteria</h3>
+    <ol>
+      <li><strong>Django REST Framework Proficiency</strong> — Use serializers, viewsets, routing and manage relationships (Events, RSVPs, Reviews).</li>
+      <li><strong>Core Python Concepts</strong> — OOP, exceptions, edge case handling.</li>
+      <li><strong>Code Quality</strong> — Clean, maintainable code following Django/DRF conventions.</li>
+      <li><strong>Authentication & Permissions</strong> — Correct JWT implementation and appropriate permissions for editing/deleting events.</li>
+    </ol>
+  </section>
+
+  <footer style="margin-top:18px; color:#666; font-size:13px;">
+    <p>API root also exposes the actual endpoints at <code>/api/events/</code>, <code>/api/token/</code>, etc. Use the links or curl/Postman to exercise the API.</p>
+  </footer>
+</body>
+</html>
